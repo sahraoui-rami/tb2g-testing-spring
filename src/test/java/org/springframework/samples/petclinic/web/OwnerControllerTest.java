@@ -120,6 +120,21 @@ class OwnerControllerTest {
         then(clinicService).should().saveOwner(any(Owner.class));
     }
 
+    @Test
+    void processCreationFormNotValid() throws Exception {
+        mockMvc.perform(
+                post("/owners/new")
+                        .param("firstName", "Jimmy")
+                        .param("lastName", "Buffett")
+                        .param("city", "Key West")
+        )
+                .andExpect(status().isOk())
+                .andExpect(model().attributeHasErrors("owner"))
+                .andExpect(model().attributeHasFieldErrors("owner", "address"))
+                .andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+                .andExpect(view().name("owners/createOrUpdateOwnerForm"));
+    }
+
     @AfterEach
     void tearDown() {
         reset(clinicService);
