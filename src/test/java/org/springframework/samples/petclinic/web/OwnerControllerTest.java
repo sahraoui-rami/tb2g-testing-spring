@@ -18,11 +18,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.reset;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -101,6 +103,21 @@ class OwnerControllerTest {
                 .findOwnerByLastName(stringArgumentCaptor.capture());
 
         assertThat(stringArgumentCaptor.getValue()).isEmpty();
+    }
+
+    @Test
+    void processCreationFormValid() throws Exception {
+        mockMvc.perform(
+                post("/owners/new")
+                        .param("firstName", "Jimmy")
+                        .param("lastName", "Buffett")
+                        .param("address", "123 Duval St")
+                        .param("city", "Key West")
+                        .param("telephone", "3151231234")
+        )
+                .andExpect(status().is3xxRedirection());
+
+        then(clinicService).should().saveOwner(any(Owner.class));
     }
 
     @AfterEach
